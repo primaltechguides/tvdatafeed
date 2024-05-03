@@ -5,6 +5,7 @@ import logging
 import random
 import re
 import string
+import time
 import pandas as pd
 from websocket import create_connection
 import requests
@@ -32,9 +33,9 @@ class Interval(enum.Enum):
 class TvDatafeed:
     __sign_in_url = 'https://www.tradingview.com/accounts/signin/'
     __search_url = 'https://symbol-search.tradingview.com/symbol_search/?text={}&hl=1&exchange={}&lang=en&type=&domain=production'
-    __ws_headers = json.dumps({"Origin": "https://data.tradingview.com"})
-    __signin_headers = {'Referer': 'https://www.tradingview.com'}
-    __ws_timeout = 5
+    __ws_headers = json.dumps({"Origin": "https://data.tradingview.com", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"})
+    __signin_headers = {'Referer': 'https://www.tradingview.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'}
+    __ws_timeout = 7
 
     def __init__(
         self,
@@ -249,8 +250,7 @@ class TvDatafeed:
         )
 
         self.__send_message(
-            "quote_add_symbols", [self.session, symbol,
-                                  {"flags": ["force_permission"]}]
+            "quote_add_symbols", [self.session, symbol]
         )
         self.__send_message("quote_fast_symbols", [self.session, symbol])
 
