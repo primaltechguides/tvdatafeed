@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="tvdatafeed",
-    version="2.1.0.2",
+    version="2.1.0.3",
     packages=["tvDatafeed"],
     url="https://github.com/rongardF/tvdatafeed/",
     project_urls={

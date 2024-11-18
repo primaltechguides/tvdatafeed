@@ -134,6 +134,10 @@ class TvDatafeed:
     @staticmethod
     def __create_df(raw_data, symbol):
         try:
+            # Extract currency_code from raw_data
+            currency_match = re.search('"currency_code":"(.*?)"', raw_data)
+            currency_code = currency_match.group(1) if currency_match else "Unknown"
+
             out = re.search('"s":\[(.+?)\}\]', raw_data).group(1)
             x = out.split(',{"')
             data = list()
@@ -146,29 +150,25 @@ class TvDatafeed:
                 row = [ts]
 
                 for i in range(5, 10):
-
-                    # skip converting volume data if does not exists
+                    # Skip converting volume data if it does not exist
                     if not volume_data and i == 9:
                         row.append(0.0)
                         continue
                     try:
                         row.append(float(xi[i]))
-
                     except ValueError:
                         volume_data = False
                         row.append(0.0)
-                        logger.debug('no volume data')
 
                 data.append(row)
 
             data = pd.DataFrame(
-                data, columns=["datetime", "open",
-                               "high", "low", "close", "volume"]
-            ).set_index("datetime")
+                data, columns=["datetime", "open", "high", "low", "close", "volume"]).set_index("datetime")
             data.insert(0, "symbol", value=symbol)
+            data.insert(len(data.columns), "currency_code", value=currency_code)
             return data
         except AttributeError:
-            logger.error("no data, please check the exchange and symbol")
+            logger.error("No data, please check the exchange and symbol")
 
     @staticmethod
     def __format_symbol(symbol, exchange, contract: int = None):
